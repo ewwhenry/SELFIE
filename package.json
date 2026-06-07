@@ -1,0 +1,21 @@
+{
+  "name": "selfie",
+  "version": "1.0.0",
+  "description": "A self-hosted file storage you actually own.",
+  "scripts": {
+    "dev": "turbo dev",
+    "lint": "biome lint .",
+    "format": "biome format . --write",
+    "check": "biome check .",
+    "check:fix": "biome check . --write"
+  },
+  "author": "ewwhenry <ewwhenry+selfie@proton.me>",
+  "license": "MIT",
+  "packageManager": "pnpm@10.22.0",
+  "dependencies": {
+    "turbo": "^2.9.16"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "^2.4.16"
+  }
+}
