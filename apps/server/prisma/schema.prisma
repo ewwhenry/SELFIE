@@ -21,7 +21,18 @@ model User {
   role Role @default(USER)
   quotaBytes BigInt @default(5368709120) // 5 GB
   files File[]
+  sessions Session[]
   createdAt DateTime @default(now())
+
+}
+
+model Session {
+  id           String   @id @default(cuid())
+  userId       String
+  refreshToken String   @unique
+  expiresAt    DateTime
+
+  user User @relation(fields: [userId], references: [id])
 }
 
 model File {

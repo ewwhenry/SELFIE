@@ -9,6 +9,7 @@
     "esModuleInterop": true,
     "lib": ["esnext"],
     "types": ["node"],
+    "typeRoots": ["node_modules/@types", "src/types"],
 
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
@@ -20,5 +21,5 @@
     "moduleDetection": "force",
     "skipLibCheck": true
   },
-  "include": ["src"]
+  "include": ["src", "src/types"]
 }
