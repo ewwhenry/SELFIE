@@ -19,9 +19,13 @@ model User {
   email String @unique
   passwordHash String
   role Role @default(USER)
+
   quotaBytes BigInt @default(5368709120) // 5 GB
+  usedBytes    BigInt   @default(0)
+  
   files File[]
   sessions Session[]
+
   createdAt DateTime @default(now())
 
 }

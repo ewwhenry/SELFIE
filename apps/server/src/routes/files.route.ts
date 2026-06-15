@@ -1,10 +1,19 @@
 import { Hono } from "hono";
-import { getUserFiles, upload } from "../controllers/files.controller";
+import {
+  batchDeleteUserFiles,
+  deleteUserFile,
+  downloadFile,
+  getUserFiles,
+  uploadFile,
+} from "../controllers/files.controller";
 import { authMiddleware } from "../middleware/authMiddleware";
 
 const app = new Hono();
 
 app.get("/", authMiddleware, getUserFiles);
-app.post("/upload", authMiddleware, upload);
+app.get("/:file_id/download", authMiddleware, downloadFile);
+app.delete("/", authMiddleware, batchDeleteUserFiles);
+app.delete("/:file_id", authMiddleware, deleteUserFile);
+app.post("/upload", authMiddleware, uploadFile);
 
 export default app;

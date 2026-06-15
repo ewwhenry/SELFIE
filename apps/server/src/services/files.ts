@@ -10,3 +10,8 @@ export const save = async (file: File, storedFilename: string) => {
   await fs.promises.writeFile(filePath, Buffer.from(await file.arrayBuffer()));
   return true;
 };
+
+export const deleteFile = async (filePath: string) => {
+  await fs.promises.unlink(filePath);
+  return true;
+};
