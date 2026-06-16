@@ -2,3 +2,5 @@
 generated
 node_modules
 uploads/
+.next
+next-env.d.ts

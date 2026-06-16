@@ -1,4 +1,10 @@
+import { setCookie } from "hono/cookie";
 import type { Handler } from "hono/types";
+import {
+  ACCESS_COOKIE_TTL_SECONDS,
+  ACCESS_TOKEN_TTL_SECONDS,
+  REFRESH_TOKEN_TTL_SECONDS,
+} from "../config";
 import { Prisma } from "../generated/prisma/client";
 import { prisma } from "../lib/prisma";
 import { hashPassword, verifyPassword } from "../services/crypto";
@@ -154,6 +160,22 @@ export const login: Handler = async (c) => {
         refreshToken,
         userId: user.id,
       },
+    });
+
+    setCookie(c, "access_token", accessToken, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+      maxAge: ACCESS_COOKIE_TTL_SECONDS,
+    });
+
+    setCookie(c, "refresh_token", refreshToken, {
+      path: "/",
+      httpOnly: true,
+      secure: true,
+      sameSite: "Lax",
+      maxAge: REFRESH_TOKEN_TTL_SECONDS,
     });
 
     c.status(200);

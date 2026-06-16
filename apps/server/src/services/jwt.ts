@@ -1,10 +1,10 @@
 import jsonwebtoken from "jsonwebtoken";
-import { JWT_SECRET } from "../config";
+import { ACCESS_TOKEN_TTL_SECONDS, JWT_SECRET } from "../config";
 import type { JWTPayload } from "../types/jwt";
 
 export const signToken = (userId: string): string => {
   return jsonwebtoken.sign({ sub: userId }, JWT_SECRET, {
-    expiresIn: "15m",
+    expiresIn: ACCESS_TOKEN_TTL_SECONDS,
   });
 };
 

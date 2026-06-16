@@ -1,4 +1,5 @@
 import { Hono } from "hono";
+import { cors } from "hono/cors";
 import { logger } from "hono/logger";
 import auth from "./routes/auth.route";
 import files from "./routes/files.route";
@@ -7,6 +8,13 @@ import users from "./routes/users.route";
 
 const app = new Hono();
 app.use(logger());
+app.use(
+  "*",
+  cors({
+    origin: "http://localhost:3000",
+    credentials: true,
+  }),
+);
 
 app.route("/health", health);
 app.route("/auth", auth);

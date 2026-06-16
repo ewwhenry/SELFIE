@@ -7,7 +7,7 @@ const app = new Hono();
 app.get("/me", authMiddleware, async (c) => {
   const userData = await prisma.user.findFirst({
     where: {
-      id: c.var.userId,
+      id: c.get("userId"),
     },
   });
 
@@ -21,10 +21,12 @@ app.get("/me", authMiddleware, async (c) => {
   c.status(200);
   return c.json({
     message: "Authentication successful",
-    user_data: {
+    data: {
       id: userData.id,
       role: userData.role,
       email: userData.email,
+      quotaBytes: userData.quotaBytes.toString(),
+      usedBytes: userData.usedBytes.toString(),
     },
   });
 });
