@@ -1,5 +1,6 @@
 "use client";
 
+import { useRouter } from "next/navigation";
 import { type SyntheticEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -9,9 +10,12 @@ import { registerUser } from "@/lib/api";
 
 export default function RegisterPage() {
   const [showPassword, setShowingPassword] = useState<boolean>(false);
+  const [firstName, setFirstName] = useState<string>("");
+  const [lastName, setLastName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
   const [password, setPassword] = useState<string>("");
   const [confirmPassword, setConfirmPassword] = useState<string>("");
+  const router = useRouter();
   const passwordsMatch = password === confirmPassword;
 
   const isSubmittable =
@@ -26,11 +30,15 @@ export default function RegisterPage() {
     }
 
     try {
-      const data = await registerUser(email, password);
+      await registerUser({
+        email,
+        first_name: firstName,
+        last_name: lastName,
+        password,
+      });
 
-      if (data.access_token) {
-      }
-    } catch (error) {}
+      router.replace("/dashboard");
+    } catch (_error) {}
   };
 
   const toggleShowPassword = (v: boolean) => setShowingPassword(v);
@@ -41,9 +49,31 @@ export default function RegisterPage() {
         You must be approved by the admin to start using your account.
       </p>
       <form onSubmit={(e) => handleForm(e)}>
-        <div className="mt-10 gap-y-2 flex flex-col">
+        <div className="grid grid-cols-2 gap-x-2">
+          <div className="mt-10 gap-y-2 flex flex-col">
+            <Label>First name</Label>
+            <Input
+              required
+              name="first_name"
+              value={firstName}
+              onChange={(e) => setFirstName(e.target.value)}
+            />
+          </div>
+          <div className="mt-10 gap-y-2 flex flex-col">
+            <Label>Last name</Label>
+            <Input
+              required
+              name="last_name"
+              value={lastName}
+              onChange={(e) => setLastName(e.target.value)}
+            />
+          </div>
+        </div>
+        <div className="mt-7 gap-y-2 flex flex-col">
           <Label>Email</Label>
           <Input
+            required
+            type="email"
             name="email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
@@ -52,6 +82,7 @@ export default function RegisterPage() {
         <div className="mt-7 gap-y-2 flex flex-col">
           <Label>Password</Label>
           <Input
+            required
             name="password"
             type={!showPassword ? "password" : "text"}
             value={password}
@@ -61,6 +92,7 @@ export default function RegisterPage() {
         <div className="mt-7 gap-y-2 flex flex-col">
           <Label>Confirm password</Label>
           <Input
+            required
             type={!showPassword ? "password" : "text"}
             value={confirmPassword}
             onChange={(e) => setConfirmPassword(e.target.value)}
@@ -77,7 +109,7 @@ export default function RegisterPage() {
           </div>
         </div>
         <div className="mt-7 gap-y-2 flex flex-col">
-          <Button disabled={!isSubmittable}>Test</Button>
+          <Button disabled={!isSubmittable}>Sign up</Button>
         </div>
       </form>
     </section>

@@ -13,21 +13,25 @@ datasource db {
 }
 
 
-// schema.prisma — modelos iniciales
 model User {
+  // DB data
   id String @id @default(uuid())
-  email String @unique
-  passwordHash String
-  role Role @default(USER)
-
-  quotaBytes BigInt @default(5368709120) // 5 GB
-  usedBytes    BigInt   @default(0)
-  
   files File[]
   sessions Session[]
 
-  createdAt DateTime @default(now())
 
+  // Personal information
+  firstName String
+  lastName String
+  email String @unique
+  role Role @default(USER)
+  passwordHash String
+
+  quotaBytes BigInt @default(5368709120) // 5 GB
+  usedBytes    BigInt   @default(0)
+
+  // Meta
+  createdAt DateTime @default(now())
 }
 
 model Session {

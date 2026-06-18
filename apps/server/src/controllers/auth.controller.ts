@@ -21,12 +21,19 @@ export const register: Handler = async (c) => {
       });
     }
 
+    if (!body.email || !body.password || !body.first_name || !body.last_name) {
+      c.status(400);
+      return c.json({ error: "Missing required fields." });
+    }
+
     const hashedPassword = await hashPassword(body.password);
 
     try {
       const newUser = await prisma.user.create({
         data: {
           email: body.email,
+          firstName: body.first_name,
+          lastName: body.last_name,
           passwordHash: hashedPassword,
           role: "USER",
         },

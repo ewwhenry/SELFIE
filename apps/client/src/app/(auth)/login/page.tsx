@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { type SyntheticEvent, useState } from "react";
 import { Button } from "@/components/ui/button";
@@ -58,6 +59,14 @@ export default function LoginPage() {
               Show password
             </Label>
           </div>
+        </div>
+        <div className="mt-7 gap-y-2 flex flex-col justify-center items-center">
+          <Label className="text-muted-foreground text-sm">
+            Don't have an account yet?{" "}
+            <Link href="/signup" className="text-accent-foreground">
+              Create an account.
+            </Link>
+          </Label>
         </div>
         <div className="mt-7 gap-y-2 flex flex-col">
           <Button disabled={true && !isSubmittable}>Log in</Button>

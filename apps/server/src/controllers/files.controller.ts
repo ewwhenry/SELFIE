@@ -2,6 +2,7 @@ import { createReadStream } from "node:fs";
 import { stat } from "node:fs/promises";
 import path from "node:path";
 import type { Context } from "hono";
+import { stream } from "hono/streaming";
 import { STORAGE_PATH } from "../config";
 import type { FileModel } from "../generated/prisma/models";
 import { prisma } from "../lib/prisma";
@@ -48,16 +49,28 @@ export const uploadFile = async (c: Context<AuthMiddlewareEnv>) => {
         `${storedFileName}.${file.type.split("/")[1]}`,
       );
 
-      const newDBFile = await prisma.file.create({
-        data: {
-          userId: c.get("userId"),
-          mimeType: file.type,
-          storedName: storedFileName,
-          originalName: file.name,
-          path: storedPath,
-          sizeBytes: file.size,
-        },
-      });
+      const [newDBFile] = await prisma.$transaction([
+        prisma.file.create({
+          data: {
+            userId: c.get("userId"),
+            mimeType: file.type,
+            storedName: storedFileName,
+            originalName: file.name,
+            path: storedPath,
+            sizeBytes: file.size,
+          },
+        }),
+        prisma.user.update({
+          where: {
+            id: c.get("userId"),
+          },
+          data: {
+            usedBytes: {
+              increment: file.size,
+            },
+          },
+        }),
+      ]);
 
       return c.json({
         message: "File uploaded",
@@ -86,6 +99,9 @@ export const getUserFiles = async (c: Context<AuthMiddlewareEnv>) => {
       where: {
         userId: c.get("userId"),
       },
+      orderBy: {
+        createdAt: "desc",
+      },
       take: Number(limit) || 10,
       ...(cursor && {
         skip: 1,
@@ -97,6 +113,7 @@ export const getUserFiles = async (c: Context<AuthMiddlewareEnv>) => {
 
     c.status(200);
     return c.json({
+      message: "success.",
       data: files.map((file) => serializeFile(file)),
       next_cursor: files.pop()?.id,
     });
@@ -125,6 +142,19 @@ export const batchDeleteUserFiles = async (c: Context<AuthMiddlewareEnv>) => {
       where: {
         id: { in: ids },
         userId: c.get("userId"),
+      },
+    });
+
+    const totalSize = files.reduce((acc, file) => acc + file.sizeBytes, 0n);
+
+    await prisma.user.update({
+      where: {
+        id: c.get("userId"),
+      },
+      data: {
+        usedBytes: {
+          decrement: totalSize,
+        },
       },
     });
 
@@ -181,6 +211,15 @@ export const deleteUserFile = async (c: Context<AuthMiddlewareEnv>) => {
         },
       });
 
+      await tx.user.update({
+        where: { id: c.get("userId") },
+        data: {
+          usedBytes: {
+            decrement: file.sizeBytes,
+          },
+        },
+      });
+
       await deleteFile(file.path);
     });
 
@@ -216,17 +255,22 @@ export const downloadFile = async (c: Context<AuthMiddlewareEnv>) => {
     }
 
     const fileStat = await stat(file.path);
+    const encodedFilename = encodeURIComponent(file.originalName);
 
     c.header("Content-Length", fileStat.size.toString());
-    c.header("Content-Type", file.mimeType.toString());
+    c.header("Content-Type", file.mimeType);
     c.header(
       "Content-Disposition",
-      `attachment; filename="${file.originalName}"`,
+      `attachment; filename="download"; filename*=UTF-8''${encodedFilename}`,
     );
 
-    const stream = createReadStream(file.path);
+    return stream(c, async (s) => {
+      const nodeStream = createReadStream(file.path);
 
-    return new Response(stream);
+      for await (const chunk of nodeStream) {
+        await s.write(chunk);
+      }
+    });
   } catch (_err) {
     console.log(_err);
   }

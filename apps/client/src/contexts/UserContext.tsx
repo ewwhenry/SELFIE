@@ -1,27 +1,37 @@
-import { createContext, useState } from "react";
+"use client";
 
-type AuthContextType = {
-  user: string | null;
-  login: (username: string) => void;
+import { useRouter } from "next/navigation";
+import { createContext, useEffect, useState } from "react";
+import { getUser } from "@/lib/api";
+import type { APICurrentUser } from "@/types/API";
+
+type UserContextType = {
+  user: APICurrentUser;
 };
 
-export const AuthContext = createContext<AuthContextType | null>(null);
+export const UserContext = createContext<UserContextType | null>(null);
 
-export function AuthProvider({ children }: { children: React.ReactNode }) {
-  const [user, setUser] = useState<string | null>(null);
+export function UserProvider({ children }: { children: React.ReactNode }) {
+  const [user, setUser] = useState<APICurrentUser | null>(null);
+  const router = useRouter();
 
-  const login = (username: string) => {
-    setUser(username);
-  };
+  useEffect(() => {
+    getUser()
+      .then((userdata) => {
+        setUser(userdata.data);
+      })
+      .catch(() => router.push("/login"));
+  }, [router]);
+
+  if (!user) return <>Loading...</>;
 
   return (
-    <AuthContext.Provider
+    <UserContext.Provider
       value={{
         user,
-        login,
       }}
     >
       {children}
-    </AuthContext.Provider>
+    </UserContext.Provider>
   );
 }

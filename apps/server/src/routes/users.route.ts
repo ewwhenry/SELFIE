@@ -25,6 +25,8 @@ app.get("/me", authMiddleware, async (c) => {
       id: userData.id,
       role: userData.role,
       email: userData.email,
+      firstName: userData.firstName,
+      lastName: userData.lastName,
       quotaBytes: userData.quotaBytes.toString(),
       usedBytes: userData.usedBytes.toString(),
     },
