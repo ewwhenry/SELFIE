@@ -2,7 +2,9 @@
   "name": "server",
   "type": "module",
   "scripts": {
-    "dev": "nodemon --config nodemon.json"
+    "dev": "nodemon --config nodemon.json",
+    "build": "tsc",
+    "start": "node dist/index.js"
   },
   "packageManager": "pnpm@10.22.0",
   "dependencies": {

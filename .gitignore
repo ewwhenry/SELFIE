@@ -4,3 +4,5 @@ node_modules
 uploads/
 .next
 next-env.d.ts
+dist
+.turbo

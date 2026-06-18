@@ -3,11 +3,10 @@ import { stat } from "node:fs/promises";
 import path from "node:path";
 import type { Context } from "hono";
 import { stream } from "hono/streaming";
-import { STORAGE_PATH } from "../config";
-import type { FileModel } from "../generated/prisma/models";
-import { prisma } from "../lib/prisma";
-import { deleteFile, save } from "../services/files";
-import { validateQuota } from "../services/validators";
+import { STORAGE_PATH } from "../config.js";
+import { prisma } from "../lib/prisma.js";
+import { deleteFile, save } from "../services/files.js";
+import { validateQuota } from "../services/validators.js";
 
 type AuthMiddlewareEnv = {
   Variables: {
@@ -15,7 +14,7 @@ type AuthMiddlewareEnv = {
   };
 };
 
-export const serializeFile = (file: FileModel) => ({
+export const serializeFile = (file) => ({
   ...file,
   sizeBytes: file.sizeBytes.toString(),
 });

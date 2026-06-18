@@ -1,14 +1,14 @@
 import { setCookie } from "hono/cookie";
 import type { Handler } from "hono/types";
+import { Prisma } from "../../generated/prisma/client.js";
 import {
   ACCESS_COOKIE_TTL_SECONDS,
-  ACCESS_TOKEN_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
-} from "../config";
-import { Prisma } from "../generated/prisma/client";
-import { prisma } from "../lib/prisma";
-import { hashPassword, verifyPassword } from "../services/crypto";
-import { signToken } from "../services/jwt";
+  SAMESITE,
+} from "../config.js";
+import { prisma } from "../lib/prisma.js";
+import { hashPassword, verifyPassword } from "../services/crypto.js";
+import { signToken } from "../services/jwt.js";
 
 export const register: Handler = async (c) => {
   try {
@@ -57,7 +57,7 @@ export const register: Handler = async (c) => {
       });
     } catch (error) {
       if (error instanceof Prisma.PrismaClientKnownRequestError) {
-        if (error.code === "P2002") {
+        if ((error as Prisma.PrismaClientKnownRequestError).code === "P2002") {
           c.status(409);
           return c.json({
             message: "Duplicated user in database",
@@ -173,7 +173,7 @@ export const login: Handler = async (c) => {
       path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: "Lax",
+      sameSite: SAMESITE,
       maxAge: ACCESS_COOKIE_TTL_SECONDS,
     });
 
@@ -181,7 +181,7 @@ export const login: Handler = async (c) => {
       path: "/",
       httpOnly: true,
       secure: true,
-      sameSite: "Lax",
+      sameSite: SAMESITE,
       maxAge: REFRESH_TOKEN_TTL_SECONDS,
     });
 

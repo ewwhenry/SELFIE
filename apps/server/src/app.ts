@@ -1,17 +1,18 @@
 import { Hono } from "hono";
 import { cors } from "hono/cors";
 import { logger } from "hono/logger";
-import auth from "./routes/auth.route";
-import files from "./routes/files.route";
-import health from "./routes/health.route";
-import users from "./routes/users.route";
+import { ALLOWED_ORIGINS } from "./config.js";
+import auth from "./routes/auth.route.js";
+import files from "./routes/files.route.js";
+import health from "./routes/health.route.js";
+import users from "./routes/users.route.js";
 
 const app = new Hono();
 app.use(logger());
 app.use(
   "*",
   cors({
-    origin: "http://localhost:3000",
+    origin: ALLOWED_ORIGINS,
     credentials: true,
     exposeHeaders: ["Content-Disposition"],
   }),

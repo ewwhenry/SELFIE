@@ -1,6 +1,6 @@
 import jsonwebtoken from "jsonwebtoken";
-import { ACCESS_TOKEN_TTL_SECONDS, JWT_SECRET } from "../config";
-import type { JWTPayload } from "../types/jwt";
+import { ACCESS_TOKEN_TTL_SECONDS, JWT_SECRET } from "../config.js";
+import type { JWTPayload } from "../types/jwt.js";
 
 export const signToken = (userId: string): string => {
   return jsonwebtoken.sign({ sub: userId }, JWT_SECRET, {

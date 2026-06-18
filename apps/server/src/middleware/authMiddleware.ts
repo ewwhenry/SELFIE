@@ -3,10 +3,11 @@ import { createMiddleware } from "hono/factory";
 import {
   ACCESS_COOKIE_TTL_SECONDS,
   REFRESH_TOKEN_TTL_SECONDS,
-} from "../config";
-import { prisma } from "../lib/prisma";
-import { signToken, verifyToken } from "../services/jwt";
-import type { JWTPayload } from "../types/jwt";
+  SAMESITE,
+} from "../config.js";
+import { prisma } from "../lib/prisma.js";
+import { signToken, verifyToken } from "../services/jwt.js";
+import type { JWTPayload } from "../types/jwt.js";
 
 export const authMiddlewareWithHeader = createMiddleware<{
   Variables: {
@@ -115,14 +116,14 @@ export const authMiddleware = createMiddleware<{
         path: "/",
         httpOnly: true,
         secure: true,
-        sameSite: "Lax",
+        sameSite: SAMESITE,
         maxAge: ACCESS_COOKIE_TTL_SECONDS,
       });
       setCookie(c, "refresh_token", newRefreshToken, {
         path: "/",
         httpOnly: true,
         secure: true,
-        sameSite: "Lax",
+        sameSite: SAMESITE,
         maxAge: REFRESH_TOKEN_TTL_SECONDS,
       });
 

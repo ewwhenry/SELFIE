@@ -1,6 +1,6 @@
 import fs from "node:fs";
 import path from "node:path";
-import { STORAGE_PATH } from "../config";
+import { STORAGE_PATH } from "../config.js";
 
 export const save = async (file: File, storedFilename: string) => {
   const filePath = path.join(

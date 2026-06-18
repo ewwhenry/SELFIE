@@ -1,18 +1,16 @@
 {
   "compilerOptions": {
-    "rootDir": "./src",
     "outDir": "./dist",
 
-    "module": "esnext",
-    "moduleResolution": "bundler",
+    "module": "nodenext",
+    "moduleResolution": "nodenext",
     "target": "es2023",
     "esModuleInterop": true,
     "lib": ["esnext"],
     "types": ["node"],
     "typeRoots": ["node_modules/@types", "src/types"],
 
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
+    "noImplicitAny": false,
 
     "noUnusedLocals": true,
 

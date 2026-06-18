@@ -5,8 +5,8 @@ import {
   downloadFile,
   getUserFiles,
   uploadFile,
-} from "../controllers/files.controller";
-import { authMiddleware } from "../middleware/authMiddleware";
+} from "../controllers/files.controller.js";
+import { authMiddleware } from "../middleware/authMiddleware.js";
 
 const app = new Hono();
 

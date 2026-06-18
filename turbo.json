@@ -5,6 +5,14 @@
     "dev": {
       "cache": false,
       "persistent": true
+    },
+    "build": {
+      "persistent": true
+    },
+    "start": {
+      "dependsOn": ["^build"],
+      "cache": true,
+      "persistent": true
     }
   }
 }
