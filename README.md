@@ -2,6 +2,8 @@
 
 > A self-hosted file storage you actually own.
 
+![Screenshot](./apps/client/public/dashboard-screenshot.png)
+
 Selfie is a lightweight, self-hosted file storage server built with **Node.js**, **TypeScript**, **Hono**, and **PostgreSQL + Prisma**. Designed to run on minimal hardware — including a rooted Android device with Termux.
 
 ![License](https://img.shields.io/badge/license-MIT-blue)
