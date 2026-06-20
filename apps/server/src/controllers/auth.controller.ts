@@ -29,13 +29,16 @@ export const register: Handler = async (c) => {
     const hashedPassword = await hashPassword(body.password);
 
     try {
+      const userCount = await prisma.user.count();
+      const role = userCount === 0 ? "ADMIN" : "USER";
+
       const newUser = await prisma.user.create({
         data: {
           email: body.email,
           firstName: body.first_name,
           lastName: body.last_name,
           passwordHash: hashedPassword,
-          role: "USER",
+          role,
         },
       });
 

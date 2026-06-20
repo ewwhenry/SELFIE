@@ -27,3 +27,21 @@ export type APIFile = {
   storedName: string;
   sizeBytes: string;
 };
+
+export interface APIAdminUser {
+  id: string;
+  firstName: string;
+  lastName: string;
+  email: string;
+  role: string;
+  quotaBytes: string;
+  usedBytes: string;
+  fileCount: number;
+  createdAt: string;
+}
+
+export interface APIAdminStats {
+  userCount: number;
+  fileCount: number;
+  totalStorageBytes: string;
+}

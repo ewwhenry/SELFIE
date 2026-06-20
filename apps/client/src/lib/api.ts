@@ -1,5 +1,7 @@
 import axios from "axios";
 import type {
+  APIAdminStats,
+  APIAdminUser,
   APICurrentUser,
   APIFile,
   APIPOSTUserRegisterBody,
@@ -82,4 +84,50 @@ export const uploadFile = async (
 
 export const deleteFile = async (fileId: string) => {
   await api.delete(`/files/${fileId}`);
+};
+
+export const updateUserProfile = async (data: {
+  firstName?: string;
+  lastName?: string;
+  email?: string;
+}): Promise<SuccessAPIResponse<APICurrentUser>> => {
+  const { data: response } = await api.patch("/users/me", data);
+  return response;
+};
+
+export const changePassword = async (
+  currentPassword: string,
+  newPassword: string,
+) => {
+  const { data } = await api.patch("/users/me/password", {
+    currentPassword,
+    newPassword,
+  });
+  return data;
+};
+
+export const getAdminStats = async (): Promise<
+  SuccessAPIResponse<APIAdminStats>
+> => {
+  const { data } = await api.get("/admin/stats");
+  return data;
+};
+
+export const getAdminUsers = async (): Promise<
+  SuccessAPIResponse<APIAdminUser[]>
+> => {
+  const { data } = await api.get("/admin/users");
+  return data;
+};
+
+export const updateAdminUser = async (
+  id: string,
+  body: { role?: string; quotaBytes?: string },
+): Promise<SuccessAPIResponse<APIAdminUser>> => {
+  const { data } = await api.patch(`/admin/users/${id}`, body);
+  return data;
+};
+
+export const deleteAdminUser = async (id: string) => {
+  await api.delete(`/admin/users/${id}`);
 };

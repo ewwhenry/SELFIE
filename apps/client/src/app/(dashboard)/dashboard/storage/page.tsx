@@ -2,7 +2,7 @@
 /** biome-ignore-all lint/a11y/noStaticElementInteractions: <explanation> */
 "use client";
 
-import { DownloadIcon, FileIcon, UploadIcon } from "lucide-react";
+import { DownloadIcon, FileIcon, Loader2Icon, UploadIcon } from "lucide-react";
 import { useEffect, useState } from "react";
 import { Button } from "@/components/ui/button";
 import {
@@ -15,6 +15,7 @@ import {
   ContextMenuSubTrigger,
   ContextMenuTrigger,
 } from "@/components/ui/context-menu";
+import { toast } from "sonner";
 import { api, deleteFile, getUserFiles, uploadFile } from "@/lib/api";
 import type { APIFile } from "@/types/API";
 
@@ -43,6 +44,7 @@ function getFilename(contentDisposition: string | null) {
 export default function StoragePage() {
   const [files, setFiles] = useState<APIFile[]>([]);
   const [uploadingFile, setUploadingFile] = useState<File | null>(null);
+  const [isUploading, setIsUploading] = useState(false);
 
   const [isDragging, setIsDragging] = useState(false);
 
@@ -101,9 +103,16 @@ export default function StoragePage() {
   useEffect(() => {
     if (!uploadingFile) return;
 
-    uploadFile(uploadingFile).then(({ data: file }) => {
-      setFiles((prev) => [file, ...prev]);
-    });
+    setIsUploading(true);
+    uploadFile(uploadingFile)
+      .then(({ data: file }) => {
+        setFiles((prev) => [file, ...prev]);
+        toast.success("File uploaded");
+      })
+      .catch(() => toast.error("Upload failed"))
+      .finally(() => {
+        setIsUploading(false);
+      });
   }, [uploadingFile]);
   return (
     <div>
@@ -167,10 +176,18 @@ export default function StoragePage() {
             : "border-muted-foreground/25 bg-card"
         }`}
       >
-        <UploadIcon className="mb-3 size-10 text-muted-foreground" />
-        <span className="font-medium">Drag & drop to upload</span>
+        {isUploading ? (
+          <Loader2Icon className="mb-3 size-10 text-muted-foreground animate-spin" />
+        ) : (
+          <UploadIcon className="mb-3 size-10 text-muted-foreground" />
+        )}
+        <span className="font-medium">
+          {isUploading ? "Uploading..." : "Drag & drop to upload"}
+        </span>
         <span className="my-2 text-sm text-muted-foreground">or</span>
-        <Button onClick={handleUploadFileButton}>Click to upload</Button>
+        <Button onClick={handleUploadFileButton} disabled={isUploading}>
+          {isUploading ? "Uploading..." : "Click to upload"}
+        </Button>
       </div>
     </div>
   );

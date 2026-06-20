@@ -1,0 +1,14 @@
+# Replace all the <xxx> with them respective values.
+DATABASE_URL="postgresql://<user>:<password>@<host>:5432/<dbname>?schema=public"
+
+# Change this to a random string and store this securely (Ignore that this says argon2).
+ARGON2_SECRET="your-secret-here"
+
+# Change this to 'development' or comment this line when running in development mode.
+NODE_ENV="production"
+
+# Replace this with your domain
+DOMAIN=".yourdomain.xyz"
+
+# Server port. I dont recomend changing this, but you can do it if you want.
+PORT=3001

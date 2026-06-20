@@ -4,6 +4,7 @@
 const nextConfig = {
   /* config options here */
   devIndicators: false,
+  allowedDevOrigins: ["selfie.ewwhenry.xyz"],
 };
 
 module.exports = nextConfig;

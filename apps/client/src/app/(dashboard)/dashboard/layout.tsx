@@ -8,17 +8,17 @@ export default function DashboardLayout({
 }) {
   return (
     <div className="grid grid-cols-6 gap-x-2">
-      {/* MAIN SIDEBAR */}
-      <div className="col-span-1 min-h-screen">
+      {/* MAIN SIDEBAR - hidden on mobile */}
+      <div className="hidden md:block col-span-1 min-h-screen">
         <DashboardSidebar />
       </div>
-      {/* CONTENT */}
-      <div className="col-span-4">
+      {/* CONTENT - full width on mobile */}
+      <div className="col-span-6 md:col-span-5 lg:col-span-4">
         <DashboardTopbar />
-        <div className="px-12 pt-2">{children}</div>
+        <div className="px-4 sm:px-12 pt-2">{children}</div>
       </div>
-      {/* RIGHT SIDEBAR */}
-      <div className="col-span-1"></div>
+      {/* RIGHT SIDEBAR - hidden on tablet and below */}
+      <div className="hidden lg:block col-span-1"></div>
     </div>
   );
 }

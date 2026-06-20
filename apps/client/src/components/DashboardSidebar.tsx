@@ -1,9 +1,16 @@
 "use client";
 
-import { HardDriveIcon, LayoutDashboardIcon, SettingsIcon } from "lucide-react";
+import {
+  HardDriveIcon,
+  LayoutDashboardIcon,
+  SettingsIcon,
+  ShieldIcon,
+} from "lucide-react";
 import Link from "next/link";
+import { useUser } from "@/hooks/useUser";
 
 export function DashboardSidebar() {
+  const { user } = useUser();
   return (
     <div className="border-r border-r-accent h-full p-6">
       <div className="flex flex-row justify-between items-center">
@@ -36,6 +43,13 @@ export function DashboardSidebar() {
               <SettingsIcon className="size-4" /> Settings
             </span>
           </Link>
+          {user.role === "ADMIN" && (
+            <Link href="/dashboard/admin">
+              <span className="border border-sidebar-accent shadow-xs py-2 px-2 rounded-md flex flex-row items-center gap-x-2 text-sm">
+                <ShieldIcon className="size-4" /> Admin
+              </span>
+            </Link>
+          )}
         </div>
       </div>
     </div>

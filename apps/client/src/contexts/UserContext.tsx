@@ -7,6 +7,7 @@ import type { APICurrentUser } from "@/types/API";
 
 type UserContextType = {
   user: APICurrentUser;
+  refreshUser: () => Promise<void>;
 };
 
 export const UserContext = createContext<UserContextType | null>(null);
@@ -29,6 +30,7 @@ export function UserProvider({ children }: { children: React.ReactNode }) {
     <UserContext.Provider
       value={{
         user,
+        refreshUser: () => getUser().then((userdata) => setUser(userdata.data)),
       }}
     >
       {children}

@@ -19,6 +19,7 @@ export const REFRESH_TOKEN_TTL_SECONDS = 60 * 60 * 24 * 30;
 export const DOMAIN = process.env.DOMAIN;
 export const ALLOWED_ORIGINS = [
   "http://localhost:3000",
+  "http://localhost:3001",
   `https://selfie${DOMAIN}`,
   `https://selfie-api${DOMAIN}`,
 ];

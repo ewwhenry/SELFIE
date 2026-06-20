@@ -1,6 +1,7 @@
 import { Inter } from "next/font/google";
 import type React from "react";
 import "./globals.css";
+import { Toaster } from "@/components/ui/sonner";
 
 const inter = Inter({
   variable: "--font-inter",
@@ -16,6 +17,7 @@ export default function RootLayout({
     <html lang="es">
       <body className={`dark ${inter.variable} ${inter.className} antialiased`}>
         {children}
+        <Toaster />
       </body>
     </html>
   );
