@@ -1,16 +1,29 @@
-# Selfie 📁
+# SELFIE 📁
 
 > A self-hosted file storage you actually own.
 
 ![Screenshot](./apps/client/public/dashboard-screenshot.png)
 
-Selfie is a lightweight, self-hosted file storage server built with **Node.js**, **TypeScript**, **Hono**, and **PostgreSQL + Prisma**. Designed to run on minimal hardware — including a rooted Android device with Termux.
+SELFIE is a self-hosted personal cloud storage platform built for simplicity and low-resource environments.
 
+![Termux](https://img.shields.io/badge/runs%20on-Termux-black)
 ![License](https://img.shields.io/badge/license-MIT-blue)
 ![Node](https://img.shields.io/badge/node-20%2B-339933)
 ![TypeScript](https://img.shields.io/badge/typescript-strict-3178C6)
 ![Prisma](https://img.shields.io/badge/prisma-7-2D3748)
 ![Built with](https://img.shields.io/badge/built%20with-turborepo-EF4444)
+
+--- 
+## Why SELFIE?
+
+Unlike larger solutions, SELFIE focuses on:
+
+- Minimal resource usage
+- Simple deployment
+- Mobile-hostable environments (Termux)
+- No object storage dependency
+- No Docker requirement
+- Modern TypeScript codebase
 
 ---
 
@@ -119,9 +132,12 @@ SELFIE/
 ### Prerequisites
 
 - [Node.js](https://nodejs.org) 20+
-- [pnpm](https://pnpm.io) (`npm i -g pnpm`)
+- [pnpm](https://pnpm.io) (`npm i -g pnpm` or other alternatives)
 - [PostgreSQL](https://www.postgresql.org) — local, remote, or via [Termux](https://termux.com)
-- [Cloudflare account](https://dash.cloudflare.com) — only if using Cloudflare Tunnel
+
+- If you're going to use tunnels (to make your storage accessible from anywhere):
+  - A [cloudflare account](https://dash.cloudflare.com)
+  - [Cloudflared CLI](https://developers.cloudflare.com/cloudflare-one/tutorials/cli/) installed in your system
 
 ### Installation
 
@@ -133,14 +149,15 @@ pnpm install
 
 ### Environment Setup
 
+Run the interactive setup script:
+
 ```bash
-cp .client_env.example apps/client/.env
-cp .server_env.example apps/server/.env
+pnpm run setup
 ```
 
-Edit both `.env` files:
-- **`apps/server/.env`** — set `DATABASE_URL`, `JWT_SECRET`, `ARGON2_SECRET`
-- **`apps/client/.env`** — set `NEXT_PUBLIC_API_URL`
+It will prompt for your domain, encryption secrets, ports, and Cloudflare tunnel setup.
+
+After the script completes, edit `apps/server/.env` to set your `DATABASE_URL`.
 
 #### Server Environment Variables
 
@@ -148,7 +165,7 @@ Edit both `.env` files:
 |---|---|---|
 | `DATABASE_URL` | — | PostgreSQL connection string |
 | `JWT_SECRET` | `"your_jwt_secret"` | Secret for signing JWT access tokens |
-| `ARGON2_SECRET` | — | Pepper for password hashing (scrypt) |
+| `CRYPT_SECRET` | — | Pepper for password hashing (scrypt) |
 | `PORT` | `3001` | Server listen port |
 | `NODE_ENV` | `"development"` | Set to `"production"` in production |
 | `DOMAIN` | — | Your domain (used for CORS & cookies) |
@@ -178,12 +195,39 @@ This creates the required tables: `User`, `Session`, and `File`.
 # Development (both client & server concurrently)
 pnpm dev
 
+# OR
+
 # Production build
 pnpm build
 
 # Production start
 pnpm start
 ```
+
+## Android (Termux)
+
+Turborepo is not currently supported on Android.
+
+Run each application separately:
+
+`apps/client`
+
+```bash
+pnpm build
+pnpm start
+```
+`apps/server`
+
+```bash
+pnpm build
+pnpm start
+```
+
+#### ⚠️ Important
+
+The compilation (build) process may take a while due to Android limitations. I'll try to find a way to speed it up as much as possible. For now, please be patient and wait until the compilation process finish.
+
+If you find any way to accelerate this process on Android, please let me know by [email](mailto:ewwhenry+selfie@proton.me) or open a PR. Thanks.
 
 ---
 
@@ -204,7 +248,7 @@ All auth endpoints return `access_token` and `refresh_token` as httpOnly cookies
 |---|---|---|---|
 | `POST` | `/auth/register` | — | Register new user. Body: `{ email, password, first_name, last_name }` |
 | `POST` | `/auth/login` | — | Login. Body: `{ email, password }` |
-| `POST` | `/auth/refresh` | — | Refresh tokens. Body: `{ refresh_token }` |
+| `POST` | `/auth/refresh` | — | Refresh tokens. Body: `{ refresh_token }`, you probably will not need this |
 
 ### Users
 
@@ -241,21 +285,23 @@ All auth endpoints return `access_token` and `refresh_token` as httpOnly cookies
 | `pnpm format` | Format all files with Biome |
 | `pnpm check` | Check all files with Biome |
 | `pnpm check:fix` | Auto-fix all Biome issues |
+| `pnpm tunnel` | Starts the tunnel configured in the setup process |
 
 ---
 
 ## Roadmap
 
-- [x] Multi-user auth with JWT
-- [x] Upload / download / delete files
-- [x] Per-user storage quotas
-- [ ] Public share links with TTL
-- [ ] Virtual folder navigation
-- [ ] CLI client (`selfie upload`, `selfie list`, ...)
-- [ ] Local folder watcher / sync
-- [ ] Admin dashboard (user management)
-- [ ] File preview (images, videos, documents)
-- [ ] Database session cleanup (TTL-based)
+### Near-term
+
+- [ ] Public share links
+- [ ] Virtual folders
+- [x] Admin dashboard
+
+### Long-term
+
+- [ ] Sync client
+- [ ] CLI
+- [ ] File previews
 
 ---
 

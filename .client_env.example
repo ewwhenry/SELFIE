@@ -1,3 +1,0 @@
-# When cloudflared tunnel is running and you have configured your domain,
-# set this to 'https://selfie-api.yourdomain.xyz'
-NEXT_PUBLIC_API_URL="http://localhost:3001"

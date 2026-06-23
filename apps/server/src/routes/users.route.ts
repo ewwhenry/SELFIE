@@ -115,4 +115,36 @@ app.patch("/me/password", authMiddleware, async (c) => {
   return c.json({ message: "Password updated" });
 });
 
+app.get("/me/sessions", authMiddleware, async (c) => {
+  const sessions = await prisma.session.findMany({
+    where: { userId: c.get("userId") },
+    orderBy: { lastActiveAt: { sort: "desc", nulls: "last" } },
+    omit: { refreshToken: true },
+  });
+
+  c.status(200);
+  return c.json({
+    data: sessions,
+    message: "success",
+  });
+});
+
+app.delete("/me/sessions/:id", authMiddleware, async (c) => {
+  const sessionId = c.req.param("id");
+
+  const session = await prisma.session.findFirst({
+    where: { id: sessionId, userId: c.get("userId") },
+  });
+
+  if (!session) {
+    c.status(404);
+    return c.json({ message: "Session not found" });
+  }
+
+  await prisma.session.delete({ where: { id: sessionId } });
+
+  c.status(200);
+  return c.json({ message: "Session revoked" });
+});
+
 export default app;

@@ -6,6 +6,7 @@ import {
   SAMESITE,
 } from "../config.js";
 import { prisma } from "../lib/prisma.js";
+import { getDeviceInfoFromHeaders } from "../services/device.js";
 import { signToken, verifyToken } from "../services/jwt.js";
 import type { JWTPayload } from "../types/jwt.js";
 
@@ -100,6 +101,8 @@ export const authMiddleware = createMiddleware<{
       const refreshExpiresAt = new Date(
         Date.now() + REFRESH_TOKEN_TTL_SECONDS * 1000,
       );
+      const { deviceName, deviceType, ipAddress } =
+        getDeviceInfoFromHeaders((name) => c.req.header(name));
 
       await prisma.session.update({
         where: {
@@ -109,6 +112,10 @@ export const authMiddleware = createMiddleware<{
         data: {
           refreshToken: newRefreshToken,
           expiresAt: refreshExpiresAt,
+          deviceName,
+          deviceType,
+          ipAddress,
+          lastActiveAt: new Date(),
         },
       });
 

@@ -3,6 +3,7 @@
 import {
   HardDriveIcon,
   LayoutDashboardIcon,
+  LinkIcon,
   SettingsIcon,
   ShieldIcon,
 } from "lucide-react";
@@ -50,6 +51,18 @@ export function DashboardSidebar() {
               </span>
             </Link>
           )}
+        </div>
+      </div>
+      <div className="mt-8">
+        <span className="flex flex-row items-center gap-x-1 mb-2 font-semibold text-sidebar-accent-foreground text-xs">
+          Files
+        </span>
+        <div className="flex flex-col gap-y-1">
+          <Link href="/dashboard/shared">
+            <span className="border border-sidebar-accent shadow-xs py-2 px-2 rounded-md flex flex-row items-center gap-x-2 text-sm">
+              <LinkIcon className="size-4" /> Shared
+            </span>
+          </Link>
         </div>
       </div>
     </div>

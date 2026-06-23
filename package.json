@@ -3,13 +3,15 @@
   "version": "1.0.0",
   "description": "A self-hosted file storage you actually own.",
   "scripts": {
+    "setup": "node scripts/setup.mjs",
     "dev": "turbo dev",
     "lint": "biome lint .",
     "format": "biome format . --write",
     "check": "biome check .",
     "check:fix": "biome check . --write",
     "build": "turbo build",
-    "start": "turbo start"
+    "start": "turbo start",
+    "tunnel": "cloudflared --config cloudflared_config.yml tunnel run"
   },
   "author": "ewwhenry <ewwhenry+selfie@proton.me>",
   "license": "MIT",

@@ -27,7 +27,7 @@ export function DashboardTopbar() {
   return (
     <div className="flex flex-row items-center pl-4 h-14">
       <Sheet>
-        <SheetTitle>Menu</SheetTitle>
+        <SheetTitle></SheetTitle>
         <SheetTrigger className="md:hidden mr-2">
           <MenuIcon className="size-5" />
         </SheetTrigger>

@@ -9,6 +9,7 @@ import {
 import { prisma } from "../lib/prisma.js";
 import { hashPassword, verifyPassword } from "../services/crypto.js";
 import { signToken } from "../services/jwt.js";
+import { getDeviceInfoFromHeaders } from "../services/device.js";
 
 export const register: Handler = async (c) => {
   try {
@@ -45,12 +46,17 @@ export const register: Handler = async (c) => {
       const accessToken = signToken(newUser.id);
       const refreshToken = crypto.randomUUID();
       const refreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+      const { deviceName, deviceType, ipAddress } =
+        getDeviceInfoFromHeaders((name) => c.req.header(name));
 
       await prisma.session.create({
         data: {
           refreshToken,
           expiresAt: refreshExpiresAt,
           userId: newUser.id,
+          deviceName,
+          deviceType,
+          ipAddress,
         },
       });
 
@@ -109,6 +115,8 @@ export const refresh: Handler = async (c) => {
     const accessToken = signToken(user.id);
     const refreshToken = crypto.randomUUID();
     const refreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const { deviceName, deviceType, ipAddress } =
+      getDeviceInfoFromHeaders((name) => c.req.header(name));
 
     await prisma.session.update({
       where: {
@@ -118,6 +126,10 @@ export const refresh: Handler = async (c) => {
       data: {
         refreshToken,
         expiresAt: refreshExpiresAt,
+        deviceName,
+        deviceType,
+        ipAddress,
+        lastActiveAt: new Date(),
       },
     });
 
@@ -163,12 +175,17 @@ export const login: Handler = async (c) => {
     const accessToken = signToken(user.id);
     const refreshToken = crypto.randomUUID();
     const refreshExpiresAt = new Date(Date.now() + 30 * 24 * 60 * 60 * 1000);
+    const { deviceName, deviceType, ipAddress } =
+      getDeviceInfoFromHeaders((name) => c.req.header(name));
 
     await prisma.session.create({
       data: {
         expiresAt: refreshExpiresAt,
         refreshToken,
         userId: user.id,
+        deviceName,
+        deviceType,
+        ipAddress,
       },
     });
 

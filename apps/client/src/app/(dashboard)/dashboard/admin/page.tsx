@@ -1,6 +1,14 @@
 "use client";
 
-import { FileIcon, HardDriveIcon, TrashIcon, UsersIcon } from "lucide-react";
+import {
+  CloudIcon,
+  FileIcon,
+  HardDriveIcon,
+  PlayIcon,
+  SquareIcon,
+  TrashIcon,
+  UsersIcon,
+} from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
@@ -11,6 +19,9 @@ import {
   deleteAdminUser,
   getAdminStats,
   getAdminUsers,
+  getTunnelStatus,
+  startTunnel,
+  stopTunnel,
   updateAdminUser,
 } from "@/lib/api";
 import type { APIAdminStats, APIAdminUser } from "@/types/API";
@@ -44,6 +55,12 @@ export default function AdminPage() {
   const [users, setUsers] = useState<APIAdminUser[]>([]);
   const [editingQuota, setEditingQuota] = useState<Record<string, string>>({});
 
+  const [tunnelInstalled, setTunnelInstalled] = useState(false);
+  const [tunnelVersion, setTunnelVersion] = useState("");
+  const [tunnelRunning, setTunnelRunning] = useState(false);
+  const [tunnelName, setTunnelName] = useState("");
+  const [tunnelToggling, setTunnelToggling] = useState(false);
+
   useEffect(() => {
     if (user.role !== "ADMIN") {
       router.replace("/dashboard");
@@ -51,6 +68,14 @@ export default function AdminPage() {
     }
 
     getAdminStats().then(({ data }) => setStats(data));
+    getTunnelStatus()
+      .then(({ data }) => {
+        setTunnelInstalled(data.installed);
+        setTunnelVersion(data.version ?? "");
+        setTunnelRunning(data.running);
+        if (data.tunnelName) setTunnelName(data.tunnelName);
+      })
+      .catch(() => {});
     getAdminUsers().then(({ data }) => {
       setUsers(data);
       const quotas: Record<string, string> = {};
@@ -178,7 +203,9 @@ export default function AdminPage() {
                       size="xs"
                       onClick={() => handleRoleToggle(u)}
                       disabled={u.id === user.id}
-                      title={u.id === user.id ? "Cannot change your own role" : ""}
+                      title={
+                        u.id === user.id ? "Cannot change your own role" : ""
+                      }
                     >
                       {u.role}
                     </Button>
@@ -225,6 +252,86 @@ export default function AdminPage() {
               ))}
             </tbody>
           </table>
+        </div>
+      </div>
+
+      <div className="mt-8 rounded-xl border bg-card p-6">
+        <div className="flex items-center gap-x-2 mb-1">
+          <CloudIcon className="size-5 text-muted-foreground" />
+          <h2 className="font-semibold">Cloudflare Tunnel</h2>
+        </div>
+        <p className="text-sm text-muted-foreground mb-6">
+          Manage your Cloudflare tunnel connection
+        </p>
+
+        <div className="space-y-4 max-w-md">
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">cloudflared</span>
+            <span
+              className={tunnelInstalled ? "text-green-400" : "text-red-400"}
+            >
+              {tunnelInstalled
+                ? `Installed${tunnelVersion ? ` (${tunnelVersion})` : ""}`
+                : "Not installed"}
+            </span>
+          </div>
+          <div className="flex items-center justify-between text-sm">
+            <span className="text-muted-foreground">Status</span>
+            <span
+              className={
+                tunnelRunning ? "text-green-400" : "text-muted-foreground"
+              }
+            >
+              {tunnelRunning ? "Running" : "Stopped"}
+            </span>
+          </div>
+          <div className="flex gap-3">
+            <Button
+              variant="default"
+              onClick={async () => {
+                setTunnelToggling(true);
+                try {
+                  await startTunnel(tunnelName);
+                  toast.success("Tunnel started");
+                  const { data } = await getTunnelStatus();
+                  setTunnelRunning(data.running);
+                } catch {
+                  toast.error("Failed to start tunnel");
+                } finally {
+                  setTunnelToggling(false);
+                }
+              }}
+              disabled={tunnelToggling || !tunnelInstalled || tunnelRunning}
+            >
+              <PlayIcon /> Start
+            </Button>
+            <Button
+              variant="outline"
+              onClick={async () => {
+                setTunnelToggling(true);
+                try {
+                  await stopTunnel();
+                  toast.success("Tunnel stopped");
+                  setTunnelRunning(false);
+                } catch {
+                  toast.error("Failed to stop tunnel");
+                } finally {
+                  setTunnelToggling(false);
+                }
+              }}
+              disabled={tunnelToggling || !tunnelRunning}
+            >
+              <SquareIcon /> Stop
+            </Button>
+          </div>
+
+          <div className="space-y-1">
+            <p className="text-red-500 text-sm">
+              Stop only if you are in development mode. Otherwise, you will lose
+              access to the app and you can only be able to access via localhost
+              until you enable the tunnel again manually.
+            </p>
+          </div>
         </div>
       </div>
     </div>

@@ -17,6 +17,7 @@ model User {
   // DB data
   id String @id @default(uuid())
   files File[]
+  folders Folder[]
   sessions Session[]
 
 
@@ -39,8 +40,27 @@ model Session {
   userId       String
   refreshToken String   @unique
   expiresAt    DateTime
+  deviceName   String?
+  deviceType   String?
+  ipAddress    String?
+  lastActiveAt DateTime?
 
   user User @relation(fields: [userId], references: [id])
+}
+
+model Folder {
+  id        String   @id @default(uuid())
+  userId    String
+  user      User     @relation(fields: [userId], references: [id])
+  name      String
+  parentId  String?
+  parent    Folder?  @relation("FolderHierarchy", fields: [parentId], references: [id])
+  children  Folder[] @relation("FolderHierarchy")
+  files     File[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([userId, name, parentId])
 }
 
 model File {
@@ -52,6 +72,10 @@ model File {
   mimeType String
   sizeBytes BigInt
   path String
+  folderId String?
+  folder Folder? @relation(fields: [folderId], references: [id])
+  shareToken String? @unique
+  shareExpiresAt DateTime?
   createdAt DateTime @default(now())
 }
 

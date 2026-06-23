@@ -4,7 +4,10 @@ import type {
   APIAdminUser,
   APICurrentUser,
   APIFile,
+  APIFolder,
   APIPOSTUserRegisterBody,
+  APISharedFile,
+  APIUserSession,
   SuccessAPIResponse,
 } from "@/types/API";
 import { API_URL } from "../config";
@@ -54,6 +57,48 @@ export const getUser = async (): Promise<
   return data;
 };
 
+export const getFolders = async (): Promise<
+  SuccessAPIResponse<APIFolder[]>
+> => {
+  const { data } = await api.get("/folders");
+  return data;
+};
+
+export const createFolder = async (
+  name: string,
+  parentId?: string,
+): Promise<SuccessAPIResponse<APIFolder>> => {
+  const { data } = await api.post("/folders", { name, parentId });
+  return data;
+};
+
+export const renameFolder = async (
+  folderId: string,
+  name: string,
+): Promise<SuccessAPIResponse<APIFolder>> => {
+  const { data } = await api.patch(`/folders/${folderId}`, { name });
+  return data;
+};
+
+export const deleteFolder = async (folderId: string) => {
+  await api.delete(`/folders/${folderId}`);
+};
+
+export const setFileFolder = async (
+  fileId: string,
+  folderId: string | null,
+): Promise<SuccessAPIResponse<APIFile>> => {
+  const { data } = await api.put(`/files/${fileId}/folder`, { folderId });
+  return data;
+};
+
+export const getUserSharedFiles = async (): Promise<
+  SuccessAPIResponse<APIFile[]>
+> => {
+  const { data } = await api.get("/files/shared");
+  return data;
+};
+
 export const getUserFiles = async (): Promise<
   SuccessAPIResponse<{
     files: APIFile[];
@@ -69,6 +114,25 @@ export const getUserFiles = async (): Promise<
     },
     message: data.message,
   };
+};
+
+export type ImportResult = {
+  imported: { originalName: string; id: string }[];
+  skipped: string[];
+  errors: { file: string; error: string }[];
+};
+
+export const importArchive = async (
+  file: File,
+): Promise<SuccessAPIResponse<ImportResult>> => {
+  const { data } = await api.post("/files/import", file, {
+    headers: {
+      "Content-Type": "application/octet-stream",
+      "X-Filename": encodeURIComponent(file.name),
+    },
+    timeout: 300000,
+  });
+  return data;
 };
 
 export const uploadFile = async (
@@ -130,4 +194,59 @@ export const updateAdminUser = async (
 
 export const deleteAdminUser = async (id: string) => {
   await api.delete(`/admin/users/${id}`);
+};
+
+export const getTunnelStatus = async (): Promise<
+  SuccessAPIResponse<{
+    installed: boolean;
+    version?: string;
+    running: boolean;
+    tunnelName?: string;
+  }>
+> => {
+  const { data } = await api.get("/tunnel/status");
+  return data;
+};
+
+export const startTunnel = async (tunnelName: string) => {
+  const { data } = await api.post("/tunnel/start", { tunnelName });
+  return data;
+};
+
+export const stopTunnel = async () => {
+  const { data } = await api.post("/tunnel/stop");
+  return data;
+};
+
+export const shareFile = async (
+  fileId: string,
+  ttlDays?: number,
+): Promise<SuccessAPIResponse<APIFile>> => {
+  const { data } = await api.post(`/files/${fileId}/share`, { ttlDays });
+  return data;
+};
+
+export const unshareFile = async (
+  fileId: string,
+): Promise<SuccessAPIResponse<APIFile>> => {
+  const { data } = await api.delete(`/files/${fileId}/share`);
+  return data;
+};
+
+export const getSharedFile = async (
+  token: string,
+): Promise<SuccessAPIResponse<APISharedFile>> => {
+  const { data } = await axios.get(`${API_URL}/s/${token}`);
+  return data;
+};
+
+export const getUserSessions = async (): Promise<
+  SuccessAPIResponse<APIUserSession[]>
+> => {
+  const { data } = await api.get("/users/me/sessions");
+  return data;
+};
+
+export const revokeSession = async (sessionId: string) => {
+  await api.delete(`/users/me/sessions/${sessionId}`);
 };

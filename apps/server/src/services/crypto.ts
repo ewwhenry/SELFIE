@@ -1,6 +1,6 @@
 import { randomBytes, scryptSync, timingSafeEqual } from "node:crypto";
 
-import { ARGON2_SECRET } from "../config.js";
+import { CRYPT_SECRET } from "../config.js";
 
 const SALT_LEN = 16;
 const KEY_LEN = 64;
@@ -13,7 +13,7 @@ export function hashPassword(password: string) {
 
   const derivedKey = scryptSync(
     password,
-    Buffer.concat([salt, Buffer.from(ARGON2_SECRET)]),
+    Buffer.concat([salt, Buffer.from(CRYPT_SECRET)]),
     KEY_LEN,
     {
       N: ITERATIONS,
@@ -34,7 +34,7 @@ export function verifyPassword(stored: string, password: string) {
 
   const derivedKey = scryptSync(
     password,
-    Buffer.concat([salt, Buffer.from(ARGON2_SECRET)]),
+    Buffer.concat([salt, Buffer.from(CRYPT_SECRET)]),
     KEY_LEN,
     {
       N: ITERATIONS,
