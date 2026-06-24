@@ -2,7 +2,7 @@
 
 import { execSync } from "node:child_process";
 import { randomBytes } from "node:crypto";
-import { existsSync, writeFileSync } from "node:fs";
+import { existsSync, mkdirSync, writeFileSync, accessSync, constants } from "node:fs";
 import { resolve } from "node:path";
 import { createInterface } from "node:readline";
 
@@ -97,6 +97,26 @@ async function main() {
   const clientPort =
     (await ask("Client port (default 3000): ")).trim() || "3000";
 
+  // ── Storage directory ───────────────────────────────────────────────
+  let storageDir;
+  let storagePath;
+  while (true) {
+    storageDir =
+      (await ask("\nUploads storage path (default: ./uploads): ")).trim() ||
+      "./uploads";
+    storagePath = resolve(root, storageDir);
+    try {
+      mkdirSync(storagePath, { recursive: true });
+      accessSync(storagePath, constants.R_OK | constants.W_OK);
+      break;
+    } catch {
+      yellow(
+        `  Cannot read/write ${storagePath}. Choose another path or fix permissions.`,
+      );
+    }
+  }
+  green(`  Uploads directory: ${storagePath}`);
+
   // ── Cloudflare Tunnel ──────────────────────────────────────────────
   let setupTunnel = false;
   let tunnelName = "";
@@ -122,6 +142,7 @@ JWT_SECRET="${jwtSecret}"
 NODE_ENV="production"
 DOMAIN="${domain}"
 PORT=${serverPort}
+STORAGE_DIR="${storageDir}"
 `;
 
   // Client .env
